@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Data Display</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Data JSON</h1>
+
+        <div class="data">
+            <h2>Summary</h2>
+            <p><strong>Suhu Max:</strong> <span id="suhu-max"></span></p>
+            <p><strong>Suhu Min:</strong> <span id="suhu-min"></span></p>
+            <p><strong>Suhu Rata-rata:</strong> <span id="suhu-rata"></span></p>
+
+            <h2>Nilai Suhu Max dan Humid Max</h2>
+            <div id="suhu-humid-max"></div>
+
+            <h2>Month Year Max</h2>
+            <div id="month-year-max"></div>
+        </div>
+    </div>
+
+    <script>
+        // Fungsi untuk mengambil data dari API dan memasukkan ke dalam elemen HTML
+        function fetchData() {
+            fetch('http://localhost:3000/api/data') // Ganti URL sesuai dengan API endpoint Anda
+                .then(response => response.json())
+                .then(data => {
+                    // Menampilkan suhu max, min, dan rata-rata
+                    document.getElementById('suhu-max').textContent = data.suhumax;
+                    document.getElementById('suhu-min').textContent = data.suhumin;
+                    document.getElementById('suhu-rata').textContent = data.suhurata;
+
+                    // Menampilkan data suhu max dan humid max
+                    const suhuHumidMaxContainer = document.getElementById('suhu-humid-max');
+                    data.nilai_suhu_max_humid_max.forEach(item => {
+                        const record = document.createElement('div');
+                        record.classList.add('record');
+                        record.innerHTML = `
+                            <p><strong>ID:</strong> ${item.idx}</p>
+                            <p><strong>Suhu:</strong> ${item.suhun}</p>
+                            <p><strong>Humid:</strong> ${item.humid}</p>
+                            <p><strong>Kecerahan:</strong> ${item.kecerahan}</p>
+                            <p><strong>Timestamp:</strong> ${item.timestamp}</p>
+                        `;
+                        suhuHumidMaxContainer.appendChild(record);
+                    });
+
+                    // Menampilkan month year max
+                    const monthYearMaxContainer = document.getElementById('month-year-max');
+                    data.month_year_max.forEach(item => {
+                        const record = document.createElement('div');
+                        record.classList.add('record');
+                        record.innerHTML = `<p><strong>Month/Year:</strong> ${item.month_year}</p>`;
+                        monthYearMaxContainer.appendChild(record);
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Panggil fungsi fetchData saat halaman dimuat
+        window.onload = fetchData;
+    </script>
+</body>
+</html>
